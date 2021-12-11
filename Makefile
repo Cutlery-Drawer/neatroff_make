@@ -3,8 +3,10 @@
 # Neatroff base directory
 BASE = $(PWD)
 
-# There is no need to install it, but if you wish it, this is the location.
-#BASE = /opt/share/neatroff
+# Font, macro and manual directories
+FDIR = $(BASE)/fonts
+MDIR = $(BASE)/tmac
+MAN  = $(BASE)/share/man
 
 INSTALL = install
 MKDIR = mkdir -p -m 755
@@ -31,10 +33,10 @@ init:
 	@test -d neatrefer || git clone git://github.com/aligrudi/neatrefer.git
 	@test -d troff || git clone -b neat git://repo.or.cz/troff.git
 	@echo "Downloading fonts"
-	@cd fonts && sh ./fonts.sh
+	@cd fonts && $(MAKE) fonts
 
 init_fa: init
-	@cd fonts && sh ./fonts_fa.sh
+	@cd fonts && $(MAKE) farsi-fonts
 
 pull:
 	cd neatroff && git pull
@@ -72,7 +74,6 @@ install:
 	@$(MKDIR) "$(BASE)/troff/tbl"
 	@$(MKDIR) "$(BASE)/soin"
 	@$(MKDIR) "$(BASE)/shape"
-	@$(MKDIR) -p "$(BASE)/share/man/man1"
 	@$(INSTALL) neatroff/roff "$(BASE)/neatroff/"
 	@$(INSTALL) neatpost/post "$(BASE)/neatpost/"
 	@$(INSTALL) neatpost/pdf "$(BASE)/neatpost/"
@@ -83,26 +84,30 @@ install:
 	@$(INSTALL) shape/shape "$(BASE)/shape/"
 	@$(INSTALL) troff/pic/pic "$(BASE)/troff/pic/"
 	@$(INSTALL) troff/tbl/tbl "$(BASE)/troff/tbl/"
-	@$(INSTALL) man/neateqn.1 "$(BASE)/share/man/man1"
-	@$(INSTALL) man/neatmkfn.1 "$(BASE)/share/man/man1"
-	@$(INSTALL) man/neatpost.1 "$(BASE)/share/man/man1"
-	@$(INSTALL) man/neatrefer.1 "$(BASE)/share/man/man1"
-	@$(INSTALL) man/neatroff.1 "$(BASE)/share/man/man1"
-	@echo "Copying font descriptions to $(BASE)/tmac"
-	@$(MKDIR) "$(BASE)/tmac"
-	@cp -r tmac/* "$(BASE)/tmac/"
-	@find "$(BASE)/tmac" -type d -exec chmod 755 {} \;
-	@find "$(BASE)/tmac" -type f -exec chmod 644 {} \;
+	@echo "Copying manual pages to $(MAN)"
+	@$(MKDIR) -p "$(MAN)/man1"
+	@$(INSTALL) man/neateqn.1 "$(MAN)/man1"
+	@$(INSTALL) man/neatmkfn.1 "$(MAN)/man1"
+	@$(INSTALL) man/neatpost.1 "$(MAN)/man1"
+	@$(INSTALL) man/neatrefer.1 "$(MAN)/man1"
+	@$(INSTALL) man/neatroff.1 "$(MAN)/man1"
+	@echo "Copying macros to $(MDIR)"
+	@$(MKDIR) "$(MDIR)"
+	@cp -r tmac/* "$(MDIR)/"
+	@chmod -R 644 "$(MDIR)"
+	@chmod 755 "$(MDIR)"
+	@find "$(MDIR)" -type d -exec chmod 755 {} \;
 	@echo "Copying devutf device to $(BASE)/devutf"
 	@$(MKDIR) "$(BASE)/devutf"
 	@cp devutf/* "$(BASE)/devutf/"
 	@chmod 644 "$(BASE)/devutf"/*
-	@echo "Copying fonts to $(BASE)/fonts"
-	@$(MKDIR) "$(BASE)/fonts"
-	@cp fonts/* "$(BASE)/fonts/"
-	@chmod 644 "$(BASE)/fonts"/*
+	@echo "Copying fonts to $(FDIR)"
+	@cd fonts && $(MAKE) clean
+	@$(MKDIR) "$(FDIR)"
+	@cp fonts/* "$(FDIR)/"
+	@chmod 644 "$(FDIR)"/*
 	@echo "Updating fontpath in font descriptions"
-	@for f in "$(BASE)/devutf"/*; do sed "/^fontpath /s=$(PWD)/fonts=$(BASE)/devutf=" <$$f >.fd.tmp; mv .fd.tmp $$f; done
+	@for f in "$(BASE)/devutf"/*; do sed "/^fontpath /s=$(FDIR)=$(BASE)/devutf=" <"$$f" >.fd.tmp; mv .fd.tmp "$$f"; done
 
 clean:
 	@cd neatroff && $(MAKE) clean
@@ -114,4 +119,4 @@ clean:
 	@cd troff/pic && $(MAKE) clean
 	@cd soin && $(MAKE) clean
 	@test ! -d shape || (cd shape && $(MAKE) clean)
-	@rm -fr $(PWD)/devutf
+	@rm -fr "$(PWD)/devutf"
