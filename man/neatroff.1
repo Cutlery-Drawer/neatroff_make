@@ -80,11 +80,13 @@ Sets the macro directory.
 The default is typically
 /usr/share/neatroff/tmac.
 .SH FILES
-.IP "/usr/share/neatroff/tmac/tmac.x" 4
+.ds /F /usr/share/neatroff/font
+.ds /M /usr/share/neatroff/tmac
+.IP "\*(/M/tmac.x" 4
 The
 .I x
 macro package.
-.IP "/usr/share/neatroff/font/*"
+.IP "\*(/F/*"
 Output device directories.
 .SH "SEE ALSO"
 .IR neatpost (1),

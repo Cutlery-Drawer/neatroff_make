@@ -121,6 +121,13 @@ install:
 	@chmod 644 "$(FDIR)"/*
 	@echo "Updating fontpath in font descriptions"
 	@for f in "$(DDIR)"/*; do sed "/^fontpath /s=$(FDIR)=$(DDIR)=" <"$$f" >.fd.tmp; mv .fd.tmp "$$f"; done
+	@echo "Updating paths in man pages"
+	@cd "$(MAN)/man1" && for f in *.1; do sed "\
+		s|\(^\.ds /D \).*|\1$(DDIR)|; \
+		s|\(^\.ds /F \).*|\1$(FDIR)|; \
+		s|\(^\.ds /M \).*|\1$(MDIR)|; \
+	" <"$$f" >.tmp; mv .tmp "$$f"; \
+	done
 
 clean:
 	@cd fonts && $(MAKE) clean
