@@ -4,6 +4,12 @@ AMS_URL = http://www.ams.org/arc/tex/amsfonts.zip
 IR_URL  = http://fs.rudi.ir/irfonts.tar.gz
 B_URL   = http://fs.rudi.ir/bfonts.tar.gz
 
+# Files used to determine which packages have been downloaded and extracted
+URW     = URWGothic-Book.t1
+AMS     = CMR8.pfb
+IR      = IRNazanin.ttf
+B       = BLotus.ttf
+
 
 # Install everything
 all: fonts farsi-fonts
@@ -26,49 +32,54 @@ bfonts.tar.gz:;     $(GET) $@ "$(B_URL)"
 # Tasks for unpackaging assets
 UNTAR = echo "Unpacking $?"; tar xzf
 UNZIP = echo "Unzipping $?"; unzip
-STAMP = rm -rf "$@" && touch $@
 
-ams-fonts: amsfonts.zip
-	test -d $@ || mkdir $@
-	$(UNZIP) -Cjqd $@ $? \
+ams-fonts: $(AMS)
+$(AMS): amsfonts.zip
+	@test -d ams || mkdir ams
+	@$(UNZIP) -Cjqd ams $? \
 		'fonts/afm/public/amsfonts/cm/*.afm' \
 		'fonts/type1/public/amsfonts/cm/*.pfb'
-	for x in $@/*; do \
-		chmod 0644 $$x; \
-		mv $$x `basename "$${x%.*}" | tr a-z A-Z`."$${x##*.}"; \
+	@for x in ams/*; do \
+		chmod 0644 "$$x"; \
+		touch -r $? "$$x"; \
+		mv "$$x" `basename "$${x%.*}" | tr a-z A-Z`."$${x##*.}"; \
 	done
-	$(STAMP)
+	@rm -rf ams
 
-urw-fonts: urw-base35.tar.gz
-	$(UNTAR) $?
-	mv urw-base35*/fonts/*.t1 .
-	mv urw-base35*/fonts/*.afm .
-	rm -rf urw-base35*/
-	$(STAMP)
+urw-fonts: $(URW)
+$(URW): urw-base35.tar.gz
+	@$(UNTAR) $?
+	@for i in \
+		urw-base35*/fonts/*.t1 \
+		urw-base35*/fonts/*.afm \
+	; do \
+		touch -r $? "$$i"; \
+		mv "$$i" .; \
+	done
+	@rm -rf urw-base35*/
 
-irfonts: irfonts.tar.gz
-	$(UNTAR) $?
-	mv $@/*.ttf .
-	$(STAMP)
+irfonts: $(IR)
+$(IR): irfonts.tar.gz
+	@$(UNTAR) $?
+	@touch -r $? irfonts/*.ttf
+	@mv irfonts/*.ttf .
+	@rm -rf irfonts*/
 
-bfonts: bfonts.tar.gz
-	$(UNTAR) $?
-	mv $@/*.ttf .
-	$(STAMP)
+bfonts: $(B)
+$(B): bfonts.tar.gz
+	@$(UNTAR) $?
+	@touch -r $? bfonts/*.ttf
+	@mv bfonts/*.ttf .
+	@rm -rf bfonts*/
 
 
 # Tasks related to artefact/asset removal
 OBJS = urw-base35.tar.gz amsfonts.zip irfonts.tar.gz bfonts.tar.gz
-PKGS = ams-fonts urw-fonts irfonts bfonts
 
-# Remove stamps and font packages
+# Remove downloaded packages and extracted fonts
 clean:
-	rm -rf $(OBJS) $(PKGS)
-
-# As above, but remove extracted fonts as well
-clobber: clean
-	rm -f *.afm *.pfb *.t1 *.ttf
+	rm -rf $(OBJS) *.afm *.pfb *.t1 *.ttf
 
 .PHONY: clean clobber
 .SECONDARY: $(OBJS)
-.SILENT: $(OBJS) $(PKGS)
+.SILENT: $(OBJS)
