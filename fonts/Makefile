@@ -14,7 +14,7 @@ B       = BLotus.ttf
 # Install everything
 all: fonts farsi-fonts
 
-# Install Ghostscript and AMS/Computer Modern fonts
+# Install Computer Modern and URW-Core35 fonts
 fonts: urw-fonts ams-fonts
 
 # Install Farsi fonts
@@ -80,6 +80,6 @@ OBJS = urw-base35.tar.gz amsfonts.zip irfonts.tar.gz bfonts.tar.gz
 clean:
 	rm -rf $(OBJS) *.afm *.pfb *.t1 *.ttf
 
-.PHONY: clean clobber
+.PHONY: clean
 .SECONDARY: $(OBJS)
 .SILENT: $(OBJS)

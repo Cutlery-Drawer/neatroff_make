@@ -18,24 +18,24 @@ all: help
 help:
 	@echo "Neatroff top-level makefile"
 	@echo
-	@echo "   init        Initialise git repositories and fonts"
+	@echo "   init        Initialise Git repositories and fonts"
 	@echo "   init_fa     Initialise for Farsi"
 	@echo "   neat        Compile the programs and generate the fonts"
-	@echo "   pull        Update git repositories (git pull)"
+	@echo "   pull        Update Git repositories (git pull)"
 	@echo "   clean       Remove the generated files"
 	@echo "   install     Install Neatroff in $(BASE)"
-	@echo "   vars        List effective directory variables"
+	@echo "   vars        Display directory variables"
 	@echo
 
 vars:
 	@echo "Directory variables"
 	@echo
-	@echo "    Base          \$$BASE = $(BASE)"
-	@echo "    Binaries      \$$BDIR = $(BDIR)"
-	@echo "    Device        \$$DDIR = $(DDIR)"
-	@echo "    Fonts         \$$FDIR = $(FDIR)"
-	@echo "    Macros        \$$MDIR = $(MDIR)"
-	@echo "    Man pages     \$$MAN  = $(MAN)"
+	@echo "   Base        \$$BASE = $(BASE)"
+	@echo "   Binaries    \$$BDIR = $(BDIR)"
+	@echo "   Device      \$$DDIR = $(DDIR)"
+	@echo "   Fonts       \$$FDIR = $(FDIR)"
+	@echo "   Macros      \$$MDIR = $(MDIR)"
+	@echo "   Man pages   \$$MAN  = $(MAN)"
 	@echo
 
 init:
