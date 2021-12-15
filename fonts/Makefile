@@ -16,7 +16,7 @@ farsi-fonts: irfonts bfonts
 
 
 # Tasks for asset retrieval
-GET = echo "Fetching $@"; wget --no-config -nv -cO
+GET = echo "Fetching $@"; wget --no-config --no-check-certificate -nv -cO
 urw-base35.tar.gz:; $(GET) $@ "$(URW_URL)"
 amsfonts.zip:;      $(GET) $@ "$(AMS_URL)"
 irfonts.tar.gz:;    $(GET) $@ "$(IR_URL)"
