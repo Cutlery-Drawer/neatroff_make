@@ -1,0 +1,4 @@
+# Fix language classification on GitHub.com
+Fontmap linguist-language=PostScript
+tmac.*  linguist-language=Roff
+*.tr    linguist-language=Roff
