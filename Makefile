@@ -3,7 +3,9 @@
 # Neatroff base directory
 BASE = $(PWD)
 
-# Font, macro and manual directories
+# Subcomponent directories
+BDIR = $(BASE)
+DDIR = $(BASE)/devutf
 FDIR = $(BASE)/fonts
 MDIR = $(BASE)/tmac
 MAN  = $(BASE)/share/man
@@ -22,6 +24,18 @@ help:
 	@echo "   pull        Update git repositories (git pull)"
 	@echo "   clean       Remove the generated files"
 	@echo "   install     Install Neatroff in $(BASE)"
+	@echo "   vars        List effective directory variables"
+	@echo
+
+vars:
+	@echo "Directory variables"
+	@echo
+	@echo "    Base          \$$BASE = $(BASE)"
+	@echo "    Binaries      \$$BDIR = $(BDIR)"
+	@echo "    Device        \$$DDIR = $(DDIR)"
+	@echo "    Fonts         \$$FDIR = $(FDIR)"
+	@echo "    Macros        \$$MDIR = $(MDIR)"
+	@echo "    Man pages     \$$MAN  = $(MAN)"
 	@echo
 
 init:
@@ -61,29 +75,29 @@ comp:
 
 neat: comp
 	@echo "Generating font descriptions"
-	@cd neatmkfn && ./gen.sh "$(PWD)/fonts" "$(PWD)/devutf" >/dev/null
+	@cd neatmkfn && ./gen.sh "$(PWD)/fonts" "$(DDIR)" >/dev/null
 
 install:
-	@echo "Copying binaries to $(BASE)"
-	@$(MKDIR) "$(BASE)/neatroff"
-	@$(MKDIR) "$(BASE)/neatpost"
-	@$(MKDIR) "$(BASE)/neateqn"
-	@$(MKDIR) "$(BASE)/neatmkfn"
-	@$(MKDIR) "$(BASE)/neatrefer"
-	@$(MKDIR) "$(BASE)/troff/pic"
-	@$(MKDIR) "$(BASE)/troff/tbl"
-	@$(MKDIR) "$(BASE)/soin"
-	@$(MKDIR) "$(BASE)/shape"
-	@$(INSTALL) neatroff/roff "$(BASE)/neatroff/"
-	@$(INSTALL) neatpost/post "$(BASE)/neatpost/"
-	@$(INSTALL) neatpost/pdf "$(BASE)/neatpost/"
-	@$(INSTALL) neateqn/eqn "$(BASE)/neateqn/"
-	@$(INSTALL) neatmkfn/mkfn "$(BASE)/neatmkfn/"
-	@$(INSTALL) neatrefer/refer "$(BASE)/neatrefer/"
-	@$(INSTALL) soin/soin "$(BASE)/soin/"
-	@$(INSTALL) shape/shape "$(BASE)/shape/"
-	@$(INSTALL) troff/pic/pic "$(BASE)/troff/pic/"
-	@$(INSTALL) troff/tbl/tbl "$(BASE)/troff/tbl/"
+	@echo "Copying binaries to $(BDIR)"
+	@$(MKDIR) "$(BDIR)/neatroff"
+	@$(MKDIR) "$(BDIR)/neatpost"
+	@$(MKDIR) "$(BDIR)/neateqn"
+	@$(MKDIR) "$(BDIR)/neatmkfn"
+	@$(MKDIR) "$(BDIR)/neatrefer"
+	@$(MKDIR) "$(BDIR)/troff/pic"
+	@$(MKDIR) "$(BDIR)/troff/tbl"
+	@$(MKDIR) "$(BDIR)/soin"
+	@$(MKDIR) "$(BDIR)/shape"
+	@$(INSTALL) neatroff/roff "$(BDIR)/neatroff/"
+	@$(INSTALL) neatpost/post "$(BDIR)/neatpost/"
+	@$(INSTALL) neatpost/pdf "$(BDIR)/neatpost/"
+	@$(INSTALL) neateqn/eqn "$(BDIR)/neateqn/"
+	@$(INSTALL) neatmkfn/mkfn "$(BDIR)/neatmkfn/"
+	@$(INSTALL) neatrefer/refer "$(BDIR)/neatrefer/"
+	@$(INSTALL) soin/soin "$(BDIR)/soin/"
+	@$(INSTALL) shape/shape "$(BDIR)/shape/"
+	@$(INSTALL) troff/pic/pic "$(BDIR)/troff/pic/"
+	@$(INSTALL) troff/tbl/tbl "$(BDIR)/troff/tbl/"
 	@echo "Copying manual pages to $(MAN)"
 	@$(MKDIR) -p "$(MAN)/man1"
 	@$(INSTALL) man/neateqn.1 "$(MAN)/man1"
@@ -97,19 +111,20 @@ install:
 	@chmod -R 644 "$(MDIR)"
 	@chmod 755 "$(MDIR)"
 	@find "$(MDIR)" -type d -exec chmod 755 {} \;
-	@echo "Copying devutf device to $(BASE)/devutf"
-	@$(MKDIR) "$(BASE)/devutf"
-	@cp devutf/* "$(BASE)/devutf/"
-	@chmod 644 "$(BASE)/devutf"/*
+	@echo "Copying devutf device to $(DDIR)"
+	@$(MKDIR) "$(DDIR)"
+	@cp devutf/* "$(DDIR)"
+	@chmod 644 "$(DDIR)"/*
 	@echo "Copying fonts to $(FDIR)"
 	@cd fonts && $(MAKE) clean
 	@$(MKDIR) "$(FDIR)"
 	@cp fonts/* "$(FDIR)/"
 	@chmod 644 "$(FDIR)"/*
 	@echo "Updating fontpath in font descriptions"
-	@for f in "$(BASE)/devutf"/*; do sed "/^fontpath /s=$(FDIR)=$(BASE)/devutf=" <"$$f" >.fd.tmp; mv .fd.tmp "$$f"; done
+	@for f in "$(DDIR)"/*; do sed "/^fontpath /s=$(FDIR)=$(DDIR)=" <"$$f" >.fd.tmp; mv .fd.tmp "$$f"; done
 
 clean:
+	@cd fonts && $(MAKE) clean
 	@cd neatroff && $(MAKE) clean
 	@cd neatpost && $(MAKE) clean
 	@cd neateqn && $(MAKE) clean
@@ -119,4 +134,5 @@ clean:
 	@cd troff/pic && $(MAKE) clean
 	@cd soin && $(MAKE) clean
 	@test ! -d shape || (cd shape && $(MAKE) clean)
-	@rm -fr "$(PWD)/devutf"
+	@rm -rf "$(DDIR)"
+	
