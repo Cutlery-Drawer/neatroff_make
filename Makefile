@@ -63,8 +63,8 @@ pull:
 
 comp:
 	@echo "Compiling programs"
-	@cd neatroff && $(MAKE) FDIR="$(BASE)" MDIR="$(BASE)/tmac"
-	@cd neatpost && $(MAKE) FDIR="$(BASE)" MDIR="$(BASE)/tmac"
+	@cd neatroff && $(MAKE) FDIR="$(FDIR)" MDIR="$(MDIR)"
+	@cd neatpost && $(MAKE) FDIR="$(FDIR)" MDIR="$(MDIR)"
 	@cd neateqn && $(MAKE)
 	@cd neatmkfn && $(MAKE)
 	@cd neatrefer && $(MAKE)
@@ -75,7 +75,7 @@ comp:
 
 neat: comp
 	@echo "Generating font descriptions"
-	@cd neatmkfn && ./gen.sh "$(PWD)/fonts" "$(DDIR)" >/dev/null
+	@cd neatmkfn && ./gen.sh "$(PWD)/fonts" "$(PWD)/devutf" >/dev/null
 
 install:
 	@echo "Copying binaries to $(BDIR)"
@@ -99,7 +99,7 @@ install:
 	@$(INSTALL) troff/pic/pic "$(BDIR)/troff/pic/"
 	@$(INSTALL) troff/tbl/tbl "$(BDIR)/troff/tbl/"
 	@echo "Copying manual pages to $(MAN)"
-	@$(MKDIR) -p "$(MAN)/man1"
+	@$(MKDIR) "$(MAN)/man1"
 	@$(INSTALL) man/neateqn.1 "$(MAN)/man1"
 	@$(INSTALL) man/neatmkfn.1 "$(MAN)/man1"
 	@$(INSTALL) man/neatpost.1 "$(MAN)/man1"
@@ -116,9 +116,8 @@ install:
 	@cp devutf/* "$(DDIR)"
 	@chmod 644 "$(DDIR)"/*
 	@echo "Copying fonts to $(FDIR)"
-	@cd fonts && $(MAKE) clean
 	@$(MKDIR) "$(FDIR)"
-	@cp fonts/* "$(FDIR)/"
+	@cp fonts/*.afm fonts/*.pfb fonts/*.t1 fonts/*.ttf "$(FDIR)/"
 	@chmod 644 "$(FDIR)"/*
 	@echo "Updating fontpath in font descriptions"
 	@for f in "$(DDIR)"/*; do sed "/^fontpath /s=$(FDIR)=$(DDIR)=" <"$$f" >.fd.tmp; mv .fd.tmp "$$f"; done
@@ -134,5 +133,4 @@ clean:
 	@cd troff/pic && $(MAKE) clean
 	@cd soin && $(MAKE) clean
 	@test ! -d shape || (cd shape && $(MAKE) clean)
-	@rm -rf "$(DDIR)"
-	
+	@rm -rf devutf
